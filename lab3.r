@@ -13,6 +13,10 @@ post <- function(x) dbeta(x, aPost, bPost)
 plot(prior, 0, 1, ylim=c(0, 3), main = "Beta prior (dash) and  beta posterior (red)", xlab = expression(phi), ylab = "Density", lty = 2, lwd = 2)
 plot(post, 0, 1, add = TRUE, col = "red", lwd = 2)
 
+x <- seq(0,1,0.01)
+plot(x, prior(x), ylim=c(0,3), type="l")
+lines((x, post(x), col="red")
+
 bounds <- c(0.025, 0.975)
 bounds95 <- qbeta(bounds, aPost, bPost)
 bounds95
