@@ -11,22 +11,6 @@ head(y)
 qplot(n.input, emission, data=y, color =  group)
 qplot(n.input, emission, data=y, color =  fertilizer)
 
-#We will also need a function to link the sequential indices used in JAGS to the groups (fertilizer and site) in the data. 
-group_from_index = function(group, group.index, output ){
-  #group is a vector of group names or numbers
-  #group.index is vector of sequential indices to group names or numbers.  It is a sequence of integers 1 to length(group)
-  #output is a matrix or dataframe of output with number of rows = length(group). Each row contains statistics, etc for each group.
-  a = unique(as.vector(group)) 
-  b = unique(group.index)
-  group.key=as.data.frame(t(rbind(a,b))) #columns containing indices paired with group name or number
-  names(group.key)= c(names(as.data.frame(group)), names(as.data.frame(group.index))) 
-  link.column.name = names(group.key)[2] #name of column for merging output data with groups
-  output2 = cbind(seq(1,nrow(output)),output) #give the output data sequential index the same as 
-  colnames(output2)[1]=link.column.name
-  group.data=as.data.frame(merge(group.key, output2, by = link.column.name )) #merge the output with the groups
-  return(group.data)
-}
-
 #Pooled model
 
 # set up data and initial values
@@ -119,13 +103,15 @@ cat("
     mu.alpha ~ dnorm(0,.00001)
     sigma.alpha ~ dunif(0,200) #notated varsigma in model documentation
     tau.alpha <- 1/sigma.alpha^2
-    sigma ~ dunif(0,100)
-    tau.reg <- 1/sigma^2
+
     ###priors
     for(j in 1:y.n.sites){
         alpha[j] ~ dnorm(mu.alpha,tau.alpha)
       }
     beta ~ dnorm(0,.0001)
+    sigma ~ dunif(0,100)
+    tau.reg <- 1/sigma^2
+
     ####
     #likelihood
     for(i in 1:length(y.emission)){
